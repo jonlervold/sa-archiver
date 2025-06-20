@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA Thread Archiver - Image Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #4facfe;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus,
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #e9ecef;
+        }
+
+        .nav-links a.active {
+            background: #4facfe;
+            color: white;
+        }
+
+        .folder-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .folder-option {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .folder-option:hover {
+            background: #f8f9fa;
+        }
+
+        .folder-option:last-child {
+            border-bottom: none;
+        }
+
+        .folder-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .folder-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-left: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖼️ Image Gallery</h1>
+            <p>Convert downloaded images to browsable HTML galleries</p>
+        </div>
+        
+        <div class="content">
+            <div class="nav-links">
+                <a href="/">← Back to Home</a>
+            </div>
+
+            <div class="info-box">
+                <h3>📋 How it works:</h3>
+                <ul>
+                    <li><strong>Select a folder</strong> that contains downloaded images (from images-only mode)</li>
+                    <li><strong>Customize the title</strong> for your gallery (optional)</li>
+                    <li><strong>Generate HTML gallery</strong> with 100 images per page</li>
+                    <li><strong>Browse images</strong> with pagination, lightbox view, and thumbnails</li>
+                    <li><strong>Open gallery/index.html</strong> in your browser to view</li>
+                </ul>
+            </div>
+
+            {% if image_folders %}
+            <form id="galleryForm">
+                <div class="form-group">
+                    <label for="folder_name">Select Image Folder:</label>
+                    <div class="folder-list">
+                        {% for folder in image_folders %}
+                        <div class="folder-option" onclick="selectFolder('{{ folder }}')">
+                            <input type="radio" name="folder_name" value="{{ folder }}" id="folder_{{ loop.index }}">
+                            <label for="folder_{{ loop.index }}" style="font-weight: normal; display: inline;">{{ folder }}</label>
+                            <div class="folder-info">Click to select this image folder</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="custom_title">Gallery Title (optional):</label>
+                    <input type="text" id="custom_title" name="custom_title" 
+                           placeholder="Enter custom title for your gallery">
+                    <small>Leave blank to use folder name as title</small>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-button">
+                    🚀 Create Image Gallery
+                </button>
+            </form>
+            {% else %}
+            <div class="error">
+                <strong>No image folders found!</strong><br>
+                You need to download some images first using the "Images only" mode from the Archive page.
+            </div>
+            {% endif %}
+
+            <div id="progressContainer" class="progress-container">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div id="statusText" class="status-text">Initializing...</div>
+            </div>
+
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentJobId = null;
+        let statusInterval = null;
+
+        function selectFolder(folderName) {
+            const radio = document.querySelector(`input[value="${folderName}"]`);
+            radio.checked = true;
+        }
+
+        document.getElementById('galleryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const messageDiv = document.getElementById('message');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            
+            // Disable form and show progress
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Gallery...';
+            progressContainer.style.display = 'block';
+            
+            try {
+                const response = await fetch('/convert_to_gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentJobId = data.job_id;
+                    startStatusPolling();
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                resetForm();
+            }
+        });
+
+        function startStatusPolling() {
+            statusInterval = setInterval(async () => {
+                if (!currentJobId) return;
+                
+                try {
+                    const response = await fetch(`/status/${currentJobId}`);
+                    const data = await response.json();
+                    
+                    updateProgress(data);
+                    
+                    if (data.status === 'completed' || data.status === 'error') {
+                        stopStatusPolling();
+                        
+                        if (data.status === 'completed') {
+                            document.getElementById('message').innerHTML = 
+                                `<div class="success">${data.progress}</div>`;
+                        } else {
+                            document.getElementById('message').innerHTML = 
+                                `<div class="error">Error: ${data.progress}</div>`;
+                        }
+                        
+                        resetForm();
+                    }
+                    
+                } catch (error) {
+                    console.error('Status polling error:', error);
+                }
+            }, 2000);
+        }
+
+        function updateProgress(data) {
+            const statusText = document.getElementById('statusText');
+            const progressFill = document.getElementById('progressFill');
+            
+            statusText.textContent = data.progress || 'Processing...';
+            
+            // Estimate progress based on status text
+            let progress = 0;
+            if (data.progress) {
+                if (data.progress.includes('Scanning')) progress = 10;
+                else if (data.progress.includes('Found')) progress = 20;
+                else if (data.progress.includes('Generated page')) {
+                    const match = data.progress.match(/Generated page (\d+) of (\d+)/);
+                    if (match) {
+                        progress = 30 + (parseInt(match[1]) / parseInt(match[2])) * 50;
+                    }
+                } else if (data.progress.includes('Creating gallery index')) progress = 85;
+                else if (data.progress.includes('Gallery created')) progress = 100;
+            }
+            
+            progressFill.style.width = progress + '%';
+        }
+
+        function stopStatusPolling() {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+                statusInterval = null;
+            }
+        }
+
+        function resetForm() {
+            const submitBtn = document.getElementById('submitBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🚀 Create Image Gallery';
+            progressContainer.style.display = 'none';
+            currentJobId = null;
+        }
+    </script>
+</body>
+</html> 

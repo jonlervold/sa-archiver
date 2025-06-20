@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  sa-archiver:
+    build: .
+    container_name: sa-archiver
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./output:/app/output
+    restart: unless-stopped
+    # stdin_open: true
+    # tty: true
+    # environment:
+    #   # Optional: Set these to run non-interactively
+    #   # SA_URL: "https://forums.somethingawful.com/showthread.php?threadid=12345"
+    #   # SA_START_PAGE: "1"
+    #   # SA_END_PAGE: "10"
+    #   # SA_FOLDER: "thread_archive"
+    #   # SA_MODE: "1"
+    #   # SA_USERID: "your_userid"
+    #   # SA_PASSWORD: "your_password" 
